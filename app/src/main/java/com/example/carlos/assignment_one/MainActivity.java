@@ -2,6 +2,7 @@ package com.example.carlos.assignment_one;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -11,7 +12,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Debug;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,6 +19,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.support.v4.app.Fragment;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.soundcloud.android.crop.Crop;
@@ -26,11 +27,10 @@ import com.soundcloud.android.crop.Crop;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.example.carlos.assignment_one.Fragment_Settings.REQUEST_CODE_TAKE_FROM_CAMERA;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ConfirmDialog.DialogListener {
 
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //getSupportActionBar().hide();
+        Log.d("activity","onCreat");
         setContentView(R.layout.activity_main);
         checkPermissions();
         CGInitViews();
@@ -50,10 +51,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void CGInitViews() {
         ArrayList<Fragment> fragments = new ArrayList<>();
+        fragments.add(new Fragment_Settings());
         fragments.add(new Fragment1());//these 3 now do not have any function now
         fragments.add(new Fragment1());
         fragments.add(new Fragment1());
-        fragments.add(new Fragment_Settings());
 
         //bind viewPager to pagerAdapater
         mViewPager= (ViewPager) findViewById(R.id.viewPager);
@@ -150,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
     private void handleCrop(int resultCode, Intent result) {
         Log.d("Fragment Settings", "handleing Crop--------");
         if (resultCode == RESULT_OK) {
-            Fragment fragSetting = myFragmentPagerAdapter.getItem(3);
+            Fragment fragSetting = myFragmentPagerAdapter.getItem(0);
             if(fragSetting!=null) {
                 Bitmap bitmap = decodeUriAsBitmap(Crop.getOutput(result));
                 ((Fragment_Settings) fragSetting).btn.setImageBitmap(bitmap);
@@ -173,5 +174,13 @@ public class MainActivity extends AppCompatActivity {
         return bitmap;
     }
 
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog) {
+        Log.d("MAIN", "positive clicked");
+    }
 
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        Log.d("MAIN", "negative clicked");
+    }
 }

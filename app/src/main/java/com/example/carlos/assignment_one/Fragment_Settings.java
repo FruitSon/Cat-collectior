@@ -1,61 +1,43 @@
 package com.example.carlos.assignment_one;
 
-import android.Manifest;
-import android.app.Activity;
-import android.content.ActivityNotFoundException;
-import android.content.ContentValues;
-import android.content.Intent;
+
+import android.app.DialogFragment;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.util.Log;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
-
 
 import android.graphics.Bitmap;
-import android.hardware.Camera;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import com.soundcloud.android.crop.Crop;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
-import static android.app.Activity.RESULT_OK;
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
 
-public class Fragment_Settings extends android.support.v4.app.Fragment {
+public class Fragment_Settings extends Fragment  {
 
     public static final int REQUEST_CODE_TAKE_FROM_CAMERA = 0;
-    //public static final int REQUEST_CODE_CROP_PHOTO = 2;
 
     private static final String IMAGE_UNSPECIFIED = "image/*";
     private static final String URI_INSTANCE_STATE_KEY = "saved_uri";
 
     //private OnFragmentInteractionListener mListener;
-    Bitmap bitmap;
     View view;
     ImageView btn;
     Button longButton;
@@ -63,8 +45,12 @@ public class Fragment_Settings extends android.support.v4.app.Fragment {
     EditText etCName;
     EditText etFName;
     EditText etPW;
-
-
+    InputMethodManager mImm;
+    boolean dialog_open;
+    boolean pwd_checked;
+    String pwd_first_time = " ";
+    DialogFragment dialog;
+    private ConfirmDialog mDialog;
     public void onClickImageButton(){
         ((MainActivity)getActivity()).onClickImageButtonSetting();
     }
@@ -81,6 +67,8 @@ public class Fragment_Settings extends android.support.v4.app.Fragment {
             //save
             //the judgement above is not definite
             saveData();
+            Toast toast_savedata =  Toast.makeText(getContext(),"Your profile is saved", Toast.LENGTH_LONG);
+            toast_savedata.show();
         }else{
             String info="";
             if(etCName.getText().length()<1){
@@ -97,6 +85,7 @@ public class Fragment_Settings extends android.support.v4.app.Fragment {
     }
     public static String SHARED_PREF = "my_sharedpref";
     public static String INTERNAL_FILE = "internal-file";
+
     private void saveData(){
         SharedPreferences sp = getActivity().getSharedPreferences(SHARED_PREF, 0);
         SharedPreferences.Editor editor = sp.edit();
@@ -113,11 +102,11 @@ public class Fragment_Settings extends android.support.v4.app.Fragment {
             editor.putString("productImg", imageBase64);
             Log.d("saveData","ImageDataSaved!!!!!");
         }
-
-        //editor.commit();
         editor.apply();
+
+
     }
-    private  void loadData(){
+    private void loadData(){
         SharedPreferences sp = getActivity().getSharedPreferences(SHARED_PREF, 0);
         etCName.setText(sp.getString("cName",""));
         etFName.setText(sp.getString("fName",""));
@@ -131,18 +120,14 @@ public class Fragment_Settings extends android.support.v4.app.Fragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-    }
-
-
-    @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         //---Inflate the layout for this fragment---
         Log.d("Fragment Settings", "onCreateView");
-        view= inflater.inflate(R.layout.fragment_fragment__settings, container, false);
+        view= inflater.inflate(R.layout.fragment_fragment_settings, container, false);
         btn=view.findViewById(R.id.imageButton);
+        mImm = (InputMethodManager)getActivity().getSystemService(INPUT_METHOD_SERVICE);
+
         btn.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -186,6 +171,55 @@ public class Fragment_Settings extends android.support.v4.app.Fragment {
         etPW = view.findViewById(R.id.editTextPW);
         etPW.addTextChangedListener(mTextW);
 
+        //set pwd confirmation
+        TextView.OnEditorActionListener mEditorActionListener = new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    if(view!=null)
+                        view.clearFocus();
+                        hideKeyboard(view);
+                    return true;
+                }
+                return false;
+            }
+        };
+
+        etCName.setOnEditorActionListener(mEditorActionListener);
+        etFName.setOnEditorActionListener(mEditorActionListener);
+
+        //trigger dialog for confirmation when the "done" button in keyboard is clicked
+        etPW.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                int input_length = etPW.getText().toString().trim().length();
+                if(actionId == EditorInfo.IME_ACTION_DONE && input_length!=0){
+                    saveButton.setClickable(false);
+                    etPW.clearFocus();
+                    return true;
+                }else if(actionId == EditorInfo.IME_ACTION_DONE && input_length==0){
+                    pwd_first_time = etPW.getText().toString();
+                    saveButton.setClickable(false);
+                    saveButton.setBackgroundColor(getResources().getColor(R.color.btn_disable));
+                    hideKeyboard(view);
+                    etPW.clearFocus();
+                }
+                return false;
+            }
+        });
+
+        //trigger dialog for confirmation when edit field lost focus
+        etPW.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if(!b && !etPW.getText().toString().equals(pwd_first_time) && etPW.getText().toString().length()!=0){
+                    hideKeyboard(view);
+                    mDialog = new ConfirmDialog();
+                    mDialog.show(getActivity().getFragmentManager(), "ConfirmDialog");
+                }
+            }
+        });
+
         saveButton=view.findViewById(R.id.buttonSave);
         saveButton.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -198,21 +232,21 @@ public class Fragment_Settings extends android.support.v4.app.Fragment {
         return view;
     }
 
-    public Fragment_Settings() {
-        super();
-        Log.d("Frag", "Fragment Settings constructor");
-    }
+    private void hideKeyboard(View view) {
+        if (mImm != null) {
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        Log.d("Fragment Settings", "onAttach");
+            Log.d("close", "keyboard");
+            mImm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if(savedInstanceState==null){
+
+        }
         Log.d("Fragment Settings", "onCreate");
     }
 
@@ -226,6 +260,7 @@ public class Fragment_Settings extends android.support.v4.app.Fragment {
     public void onStart() {
         super.onStart();
         Log.d("Fragment Settings", "onStart");
+
     }
 
     @Override
@@ -255,6 +290,7 @@ public class Fragment_Settings extends android.support.v4.app.Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
         Log.d("Fragment Settings", "onDestroy");
     }
 
@@ -265,22 +301,4 @@ public class Fragment_Settings extends android.support.v4.app.Fragment {
     }
 
 
-
-
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    /*public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
-    */
 }

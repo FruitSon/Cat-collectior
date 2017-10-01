@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="50px">
+
+
+    <EditText
+        android:id="@+id/pwd_second_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:imeOptions="flagNoFullscreen|actionDone"
+        android:singleLine="true"
+        android:hint="password entered"/>
+    <TextView
+        android:id="@+id/pwd_match"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/pwd_not_match"
+
+        android:gravity="center"/>
+
+
+</LinearLayout>

@@ -4,4 +4,10 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello dddddd fragment</string>
     <string name="hello_fragment_setting">hello! Fragment_setting</string>
+    <string name="signin">Confirm</string>
+    <string name="cancel">Cancel</string>
+    <string name="pwd_not_match">Not Match</string>
+    <string name="pwd_match">Match</string>
+
+
 </resources>
