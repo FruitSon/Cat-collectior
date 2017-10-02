@@ -68,10 +68,7 @@ public class Fragment_Settings extends Fragment  {
             etCName.setText("");
             etFName.setText("");
             etPW.setText("");
-            SharedPreferences sp = getActivity().getSharedPreferences(SHARED_PREF, 0);
-            SharedPreferences.Editor editor = sp.edit();
-            editor.clear();
-            editor.commit();
+            btn.setImageResource(0);
         }
     }
     public void onClickSaveButton(){
@@ -121,11 +118,19 @@ public class Fragment_Settings extends Fragment  {
         etCName.setText(sp.getString("cName",""));
         etFName.setText(sp.getString("fName",""));
         etPW.setText(sp.getString("pW",""));
-        if(sp.getString("productImg","")!=null) {
+        if(!sp.getString("productImg","").equals("")) {
             Log.d("saveData","ImageDataLoaded!!!!!");
             byte[] imagByte = Base64.decode(sp.getString("productImg",""), Base64.DEFAULT);
             ByteArrayInputStream bais2 = new ByteArrayInputStream(imagByte);
             btn.setImageDrawable(Drawable.createFromStream(bais2,  "imagByte"));
+        }
+
+        if (sp.getString("productImg","").equals("")&&etCName.getText().length() < 1 && etFName.getText().length() < 1 && etPW.getText().length() < 1) {
+            if (longButton.getText() != "I already have an account")
+                longButton.setText("I already have an account");
+        } else {
+            if (longButton.getText() != "Clear")
+                longButton.setText("Clear");
         }
     }
 
@@ -221,16 +226,16 @@ public class Fragment_Settings extends Fragment  {
             });
 
             //trigger dialog for confirmation when edit field lost focus
-//            etPW.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-//                @Override
-//                public void onFocusChange(View view, boolean b) {
-//                    if(!b && !etPW.getText().toString().equals(pwd_first_time) && etPW.getText().toString().length()!=0){
-//                        hideKeyboard(view);
-//                        mDialog = new ConfirmDialog();
-//                        mDialog.show(getActivity().getFragmentManager(), "ConfirmDialog");
-//                    }
-//                }
-//            });
+            etPW.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View view, boolean b) {
+                    if(!b && !etPW.getText().toString().equals(pwd_first_time) && etPW.getText().toString().length()!=0){
+                        hideKeyboard(view);
+                        mDialog = new ConfirmDialog();
+                        mDialog.show(getActivity().getFragmentManager(), "ConfirmDialog");
+                    }
+                }
+            });
 
             //trigger tooltip dialog for confirmation when edit field lost focus
             //implemented with 3rd party library EasyDialog.
@@ -325,6 +330,11 @@ public class Fragment_Settings extends Fragment  {
             saveButton.setBackgroundColor(getResources().getColor(res ? R.color.btn_enable : R.color.btn_disable));
         }
 
+    }
+
+    public void setClear(){
+        if (longButton.getText() != "Clear")
+            longButton.setText("Clear");
     }
 
     @Override

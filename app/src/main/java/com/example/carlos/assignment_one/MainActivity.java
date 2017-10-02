@@ -155,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements ConfirmDialog.Dia
             if(fragSetting!=null) {
                 Bitmap bitmap = decodeUriAsBitmap(Crop.getOutput(result));
                 ((Fragment_Settings) fragSetting).btn.setImageBitmap(bitmap);
+                ((Fragment_Settings) fragSetting).setClear();
                 //((Fragment_Settings) fragSetting).btn.refreshDrawableState();
             }
             Log.d("Fragment Settings", "handle Crop Result_Ok!!!!!!!");
