@@ -3,6 +3,7 @@ package com.example.carlos.assignment_one;
 
 import android.app.DialogFragment;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.text.TextWatcher;
 import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.util.Log;
@@ -21,8 +23,11 @@ import android.widget.EditText;
 
 import android.graphics.Bitmap;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.michael.easydialog.EasyDialog;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -46,11 +51,14 @@ public class Fragment_Settings extends Fragment  {
     EditText etFName;
     EditText etPW;
     InputMethodManager mImm;
-    boolean dialog_open;
-    boolean pwd_checked;
     String pwd_first_time = " ";
     DialogFragment dialog;
     private ConfirmDialog mDialog;
+
+     Button popConfirm ;
+     EditText popText ;
+     TextView popMatch;
+     EasyDialog ed;
     public void onClickImageButton(){
         ((MainActivity)getActivity()).onClickImageButtonSetting();
     }
@@ -60,6 +68,10 @@ public class Fragment_Settings extends Fragment  {
             etCName.setText("");
             etFName.setText("");
             etPW.setText("");
+            SharedPreferences sp = getActivity().getSharedPreferences(SHARED_PREF, 0);
+            SharedPreferences.Editor editor = sp.edit();
+            editor.clear();
+            editor.commit();
         }
     }
     public void onClickSaveButton(){
@@ -103,8 +115,6 @@ public class Fragment_Settings extends Fragment  {
             Log.d("saveData","ImageDataSaved!!!!!");
         }
         editor.apply();
-
-
     }
     private void loadData(){
         SharedPreferences sp = getActivity().getSharedPreferences(SHARED_PREF, 0);
@@ -124,111 +134,177 @@ public class Fragment_Settings extends Fragment  {
                              ViewGroup container, Bundle savedInstanceState) {
         //---Inflate the layout for this fragment---
         Log.d("Fragment Settings", "onCreateView");
-        view= inflater.inflate(R.layout.fragment_fragment_settings, container, false);
-        btn=view.findViewById(R.id.imageButton);
-        mImm = (InputMethodManager)getActivity().getSystemService(INPUT_METHOD_SERVICE);
 
-        btn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                onClickImageButton();
-            }
-        });
+            view = inflater.inflate(R.layout.fragment_fragment_settings, container, false);
+            btn = view.findViewById(R.id.imageButton);
+            mImm = (InputMethodManager) getActivity().getSystemService(INPUT_METHOD_SERVICE);
 
-        longButton = view.findViewById(R.id.buttonTop);
-        longButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                onClickLongButton();
-            }
-        });
-
-
-        TextWatcher mTextW = new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(etCName.getText().length()<1&&etFName.getText().length()<1&&etPW.getText().length()<1){
-                    if(longButton.getText()!="I already have an account")
-                        longButton.setText("I already have an account");
-                }else{
-                    if(longButton.getText()!="Clear")
-                        longButton.setText("Clear");
+            btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onClickImageButton();
                 }
-            }
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count,
-                                          int after) {
-            }
+            });
 
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        };
-        etCName = view.findViewById(R.id.editTextCName);
-        etCName.addTextChangedListener(mTextW);
-        etFName = view.findViewById(R.id.editTextFName);
-        etFName.addTextChangedListener(mTextW);
-        etPW = view.findViewById(R.id.editTextPW);
-        etPW.addTextChangedListener(mTextW);
+            longButton = view.findViewById(R.id.buttonTop);
+            longButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onClickLongButton();
+                }
+            });
 
-        //set pwd confirmation
-        TextView.OnEditorActionListener mEditorActionListener = new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    if(view!=null)
-                        view.clearFocus();
+
+            TextWatcher mTextW = new TextWatcher() {
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (etCName.getText().length() < 1 && etFName.getText().length() < 1 && etPW.getText().length() < 1) {
+                        if (longButton.getText() != "I already have an account")
+                            longButton.setText("I already have an account");
+                    } else {
+                        if (longButton.getText() != "Clear")
+                            longButton.setText("Clear");
+                    }
+                }
+
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count,
+                                              int after) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                }
+            };
+            etCName = view.findViewById(R.id.editTextCName);
+            etCName.addTextChangedListener(mTextW);
+            etFName = view.findViewById(R.id.editTextFName);
+            etFName.addTextChangedListener(mTextW);
+            etPW = view.findViewById(R.id.editTextPW);
+            etPW.addTextChangedListener(mTextW);
+
+            //set pwd confirmation
+            TextView.OnEditorActionListener mEditorActionListener = new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        if (view != null)
+                            view.clearFocus();
                         hideKeyboard(view);
-                    return true;
+                        return true;
+                    }
+                    return false;
                 }
-                return false;
-            }
-        };
+            };
 
-        etCName.setOnEditorActionListener(mEditorActionListener);
-        etFName.setOnEditorActionListener(mEditorActionListener);
+            etCName.setOnEditorActionListener(mEditorActionListener);
+            etFName.setOnEditorActionListener(mEditorActionListener);
 
-        //trigger dialog for confirmation when the "done" button in keyboard is clicked
-        etPW.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                int input_length = etPW.getText().toString().trim().length();
-                if(actionId == EditorInfo.IME_ACTION_DONE && input_length!=0){
-                    saveButton.setClickable(false);
-                    etPW.clearFocus();
-                    return true;
-                }else if(actionId == EditorInfo.IME_ACTION_DONE && input_length==0){
-                    pwd_first_time = etPW.getText().toString();
-                    saveButton.setClickable(false);
-                    saveButton.setBackgroundColor(getResources().getColor(R.color.btn_disable));
-                    hideKeyboard(view);
-                    etPW.clearFocus();
+            //trigger dialog for confirmation when the "done" button in keyboard is clicked
+            etPW.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                    int input_length = etPW.getText().toString().trim().length();
+                    if (actionId == EditorInfo.IME_ACTION_DONE && input_length != 0) {
+                        saveButton.setClickable(false);
+                        etPW.clearFocus();
+                        return true;
+                    } else if (actionId == EditorInfo.IME_ACTION_DONE && input_length == 0) {
+                        pwd_first_time = etPW.getText().toString();
+                        saveButton.setClickable(false);
+                        saveButton.setBackgroundColor(getResources().getColor(R.color.btn_disable));
+                        hideKeyboard(view);
+                        etPW.clearFocus();
+                    }
+                    return false;
                 }
-                return false;
-            }
-        });
+            });
 
-        //trigger dialog for confirmation when edit field lost focus
-        etPW.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if(!b && !etPW.getText().toString().equals(pwd_first_time) && etPW.getText().toString().length()!=0){
-                    hideKeyboard(view);
-                    mDialog = new ConfirmDialog();
-                    mDialog.show(getActivity().getFragmentManager(), "ConfirmDialog");
+            //trigger dialog for confirmation when edit field lost focus
+//            etPW.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//                @Override
+//                public void onFocusChange(View view, boolean b) {
+//                    if(!b && !etPW.getText().toString().equals(pwd_first_time) && etPW.getText().toString().length()!=0){
+//                        hideKeyboard(view);
+//                        mDialog = new ConfirmDialog();
+//                        mDialog.show(getActivity().getFragmentManager(), "ConfirmDialog");
+//                    }
+//                }
+//            });
+
+            //trigger tooltip dialog for confirmation when edit field lost focus
+            //implemented with 3rd party library EasyDialog.
+            //comment this part and enable the part above for the normal dialog implementation
+            etPW.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+                @Override
+                public void onFocusChange(View v, boolean b) {
+                    String s = etPW.getText().toString().trim();
+                    if (!b && s.length() != 0) {
+                        if (!pwd_first_time.equals(s)) {
+                            updateButtonStatus(false);
+                            View content = getActivity().getLayoutInflater().inflate(R.layout.popup_window, null);
+                            ed = new EasyDialog(getActivity())
+                                    .setLayout(content)
+                                    .setBackgroundColor(getActivity().getResources().getColor(R.color.light_grey))
+                                    .setLocationByAttachedView(etPW)
+                                    .setGravity(EasyDialog.GRAVITY_BOTTOM)
+                                    .setAnimationTranslationShow(EasyDialog.DIRECTION_Y, 1000, -600, 100, -50, 50, 0)
+                                    .setAnimationAlphaShow(1000, 0.3f, 1.0f)
+                                    .setAnimationTranslationDismiss(EasyDialog.DIRECTION_Y, 500, -50, 800)
+                                    .setAnimationAlphaDismiss(500, 1.0f, 0.0f)
+                                    .setTouchOutsideDismiss(true)
+                                    .setMatchParent(false)
+                                    .setMarginLeftAndRight(24, 24);
+
+                            ed.setOnEasyDialogDismissed(new EasyDialog.OnEasyDialogDismissed() {
+                                @Override
+                                public void onDismissed() {
+                                    hideKeyboard(getView());
+                                }
+                            });
+
+
+                            updateButtonStatus(false);
+                            popConfirm = content.findViewById(R.id.popup_confirm);
+                            popText = content.findViewById(R.id.popup_edit);
+                            popMatch = content.findViewById(R.id.popup_match);
+                            popText.setFocusable(true);
+                            popConfirm.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    pwd_first_time = popText.getText().toString().trim();
+                                    String pwd_second_time = etPW.getText().toString().trim();
+                                    if (!pwd_first_time.equals(pwd_second_time)) {
+                                        popMatch.setText(getResources().getText(R.string.pwd_not_match));
+                                        popText.setText("");
+                                        updateButtonStatus(false);
+                                    } else {
+                                        ed.dismiss();
+                                        updateButtonStatus(true);
+                                    }
+                                }
+                            });
+                            ed.show();
+                        } else {
+                            Toast toast = Toast.makeText(getContext(), "Your password has been checked", Toast.LENGTH_SHORT);
+                            toast.show();
+                            hideKeyboard(view);
+                        }
+                    }
                 }
-            }
-        });
+            });
 
-        saveButton=view.findViewById(R.id.buttonSave);
-        saveButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                onClickSaveButton();
-            }
-        });
+            saveButton = view.findViewById(R.id.buttonSave);
+            saveButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onClickSaveButton();
+                }
+            });
+            updateButtonStatus(false);
 
-        loadData();
+            loadData();
         return view;
     }
 
@@ -240,13 +316,20 @@ public class Fragment_Settings extends Fragment  {
         }
     }
 
+    private void updateButtonStatus(boolean res){
+        if(etCName.getText().length()<1 && etFName.getText().length()<1){
+            saveButton.setClickable(true);
+            saveButton.setBackgroundColor(getResources().getColor(R.color.btn_disable));
+        }else {
+            saveButton.setClickable(res);
+            saveButton.setBackgroundColor(getResources().getColor(res ? R.color.btn_enable : R.color.btn_disable));
+        }
+
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if(savedInstanceState==null){
-
-        }
         Log.d("Fragment Settings", "onCreate");
     }
 

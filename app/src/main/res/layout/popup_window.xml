@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="400dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Please enter password again for confirmation"/>
+    <EditText
+        android:id="@+id/popup_edit"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:imeOptions="flagNoFullscreen|actionDone"
+        android:singleLine="true"
+        />
+
+    <TextView
+        android:id="@+id/popup_match"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/pwd_not_match"/>
+    <Button
+        android:id="@+id/popup_confirm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Confirm" />
+
+</LinearLayout>
