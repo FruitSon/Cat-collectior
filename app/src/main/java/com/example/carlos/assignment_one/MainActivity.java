@@ -35,14 +35,14 @@ public class MainActivity extends AppCompatActivity implements ConfirmDialog.Dia
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
 
-        //CGInitViews();
+        CGInitViews();
     }
 
 
 
     private void CGInitViews() {
         ArrayList<Fragment> fragments = new ArrayList<>();
-        fragments.add(new Fragment_Settings());
+        fragments.add(new Fragment1());
         fragments.add(new Fragment1());//these 3 now do not have any function now
         fragments.add(new Fragment1());
         fragments.add(new Fragment1());

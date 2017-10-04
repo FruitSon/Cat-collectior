@@ -20,6 +20,8 @@ android {
 }
 
 dependencies {
+    //Volley for networking
+    compile 'com.android.volley:volley:1.0.0'
     //TabLayout
     compile 'com.android.support:support-v4:26.1.0'
     compile 'com.android.support:design:26.1.0'

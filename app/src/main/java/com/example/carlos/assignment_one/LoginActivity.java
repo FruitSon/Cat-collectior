@@ -11,9 +11,18 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by Carlos on 17/10/3.
  */
+
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
@@ -23,6 +32,8 @@ public class LoginActivity extends AppCompatActivity {
     public EditText _passwordText;
     public Button _loginButton;
     public TextView _signupLink;
+
+    private static final String checkProfileUrl = "http://cs65.cs.dartmouth.edu/profile.pl";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
         Log.d(TAG, "Login");
 
         if (!validate()) {
-            onLoginFailed();
+            onLoginFailed("");
             return;
         }
 
@@ -67,20 +78,40 @@ public class LoginActivity extends AppCompatActivity {
         progressDialog.setMessage("Authenticating...");
         progressDialog.show();
 
-        String email = _usernameText.getText().toString();
+        String username = _usernameText.getText().toString();
         String password = _passwordText.getText().toString();
 
-        // TODO: Implement your own authentication logic here.
 
-        new android.os.Handler().postDelayed(
-                new Runnable() {
-                    public void run() {
-                        // On complete call either onLoginSuccess or onLoginFailed
-                        onLoginSuccess();
-                        // onLoginFailed();
-                        progressDialog.dismiss();
+        String url=checkProfileUrl+"?name="+username+"&password="+password;
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        //mTxtDisplay.setText("Response: " + response.toString());
+                        try {
+                            Log.d("NAME Available check???",response.toString());
+                            progressDialog.dismiss();
+                            if(!response.has("error")){
+                                onLoginSuccess(response);
+
+                            }else{
+                                onLoginFailed(response.getString("error"));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }, 3000);
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO Auto-generated method stub
+                        Log.d("NAME Available check???","Error");
+                    }
+                });
+
+        // Access the RequestQueue through your singleton class.
+        MyVolleySingleton.getInstance(this).addToRequestQueue(jsObjRequest);
     }
 
 
@@ -102,13 +133,14 @@ public class LoginActivity extends AppCompatActivity {
         moveTaskToBack(true);
     }
 
-    public void onLoginSuccess() {
+    public void onLoginSuccess(JSONObject response) {
         _loginButton.setEnabled(true);
         finish();
     }
 
-    public void onLoginFailed() {
-        Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
+    public void onLoginFailed(String error) {
+        if(!error.equals(""))
+            Toast.makeText(getBaseContext(), error, Toast.LENGTH_LONG).show();
 
         _loginButton.setEnabled(true);
     }
@@ -116,18 +148,18 @@ public class LoginActivity extends AppCompatActivity {
     public boolean validate() {
         boolean valid = true;
 
-        String email = _usernameText.getText().toString();
+        String username = _usernameText.getText().toString();
         String password = _passwordText.getText().toString();
 
-        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _usernameText.setError("enter a valid email address");
+        if (username.isEmpty()) {
+            _usernameText.setError("need to enter a user name");
             valid = false;
         } else {
             _usernameText.setError(null);
         }
 
-        if (password.isEmpty() || password.length() < 4 || password.length() > 10) {
-            _passwordText.setError("between 4 and 10 alphanumeric characters");
+        if (password.isEmpty()) {
+            _passwordText.setError("need to enter a password");
             valid = false;
         } else {
             _passwordText.setError(null);

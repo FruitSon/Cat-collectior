@@ -41,11 +41,9 @@ public class SignupActivity extends FragmentActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
 
-        //步骤二：用add()方法加上Fragment的对象rightFragment
         fragmentSetting = new Fragment_Settings();
         transaction.replace(android.R.id.content, fragmentSetting);
 
-        //步骤三：调用commit()方法使得FragmentTransaction实例的改变生效
         transaction.commit();
 
         attachFragments();
@@ -54,6 +52,13 @@ public class SignupActivity extends FragmentActivity {
     private void attachFragments()
     {
 
+    }
+
+    public void signupSuccess(){
+        Intent data = new Intent();
+        setResult(RESULT_OK, data);  // the result is going to be passed to onActivityResult()
+        // Actually finish; this closes the activity and restores the calling Activity
+        finish();
     }
 
     @Override public void onRestart() {
