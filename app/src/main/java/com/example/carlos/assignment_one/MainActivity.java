@@ -3,32 +3,19 @@ package com.example.carlos.assignment_one;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
-import android.content.ActivityNotFoundException;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
-import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.support.v4.app.Fragment;
-import android.widget.Button;
-import android.widget.Toast;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
-import com.soundcloud.android.crop.Crop;
-
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
-
-import static com.example.carlos.assignment_one.Fragment_Settings.REQUEST_CODE_TAKE_FROM_CAMERA;
 
 public class MainActivity extends AppCompatActivity implements ConfirmDialog.DialogListener {
 
@@ -44,7 +31,11 @@ public class MainActivity extends AppCompatActivity implements ConfirmDialog.Dia
         Log.d("activity","onCreat");
         setContentView(R.layout.activity_main);
         checkPermissions();
-        CGInitViews();
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+
+        //CGInitViews();
     }
 
 
@@ -105,75 +96,13 @@ public class MainActivity extends AppCompatActivity implements ConfirmDialog.Dia
         }
     }
 
-    public void onClickImageButtonSetting() {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Construct temporary image path and name to save the taken
-        // photo
-        ContentValues values = new ContentValues(1);
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpg");
-        mImageCaptureUri = this.getContentResolver()
-                .insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-
-        intent.putExtra(MediaStore.EXTRA_OUTPUT,
-                mImageCaptureUri);
-        intent.putExtra("return-data", true);
-        try {
-            startActivityForResult(intent, REQUEST_CODE_TAKE_FROM_CAMERA);
-        } catch (ActivityNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d("Fragment Settings", "--------onActivityResult---MainActivity----");
-        if (resultCode != RESULT_OK)
-            return;
-        Log.d("Fragment Settings", "--------onActivityResult of OK-----MainActivity--");
-        switch (requestCode) {
-            case REQUEST_CODE_TAKE_FROM_CAMERA:
-                // Send image taken from camera for cropping
-                beginCrop(mImageCaptureUri);
-                break;
-            case Crop.REQUEST_CROP:
-                // Update image view after image crop
-                handleCrop(resultCode, data);
+        Log.d("MainActivity", "--------onActivityResult---MainActivity----");
 
-                break;
-        }
     }
 
-    private void beginCrop(Uri source) {
-        Uri destination = Uri.fromFile(new File(getCacheDir(), "cropped"));
-        Crop.of(source, destination).asSquare().start(this);
-    }
-
-    private void handleCrop(int resultCode, Intent result) {
-        Log.d("Fragment Settings", "handleing Crop--------");
-        if (resultCode == RESULT_OK) {
-            Fragment fragSetting = myFragmentPagerAdapter.getItem(0);
-            if(fragSetting!=null) {
-                Bitmap bitmap = decodeUriAsBitmap(Crop.getOutput(result));
-                ((Fragment_Settings) fragSetting).btn.setImageBitmap(bitmap);
-                ((Fragment_Settings) fragSetting).setClear();
-                //((Fragment_Settings) fragSetting).btn.refreshDrawableState();
-            }
-            Log.d("Fragment Settings", "handle Crop Result_Ok!!!!!!!");
-        } else if (resultCode == Crop.RESULT_ERROR) {
-            Toast.makeText(this, Crop.getError(result).getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private Bitmap decodeUriAsBitmap(Uri uri){
-        Bitmap bitmap = null;
-        try {
-            bitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(uri));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return bitmap;
-    }
 
     @Override
     public void onDialogPositiveClick(DialogFragment dialog) {

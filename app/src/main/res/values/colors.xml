@@ -3,5 +3,7 @@
     <color name="btn_disable">#c1c1c1</color>
     <color name="btn_enable">#08e98f</color>
     <color name="light_grey">#e7e7e7</color>
+    <color name="bkcolorLogin">#9b2fff00</color>
+
 
 </resources>

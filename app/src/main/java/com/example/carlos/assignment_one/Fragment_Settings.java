@@ -3,27 +3,23 @@ package com.example.carlos.assignment_one;
 
 import android.app.DialogFragment;
 import android.content.SharedPreferences;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.util.Log;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-
-import android.graphics.Bitmap;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +31,7 @@ import java.io.ByteArrayOutputStream;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
 
-public class Fragment_Settings extends Fragment  {
+public class Fragment_Settings extends Fragment {
 
     public static final int REQUEST_CODE_TAKE_FROM_CAMERA = 0;
 
@@ -60,7 +56,7 @@ public class Fragment_Settings extends Fragment  {
      TextView popMatch;
      EasyDialog ed;
     public void onClickImageButton(){
-        ((MainActivity)getActivity()).onClickImageButtonSetting();
+        ((SignupActivity)getActivity()).onClickImageButtonSetting();
     }
 
     public void onClickLongButton(){
@@ -79,17 +75,15 @@ public class Fragment_Settings extends Fragment  {
             Toast toast_savedata =  Toast.makeText(getContext(),"Your profile is saved", Toast.LENGTH_LONG);
             toast_savedata.show();
         }else{
-            String info="";
             if(etCName.getText().length()<1){
-                info+="The character Name should has at least 1 character.";
+                etCName.setError("The character Name should has at least 1 character.");
             }
             if(etFName.getText().length()<1){
-                info+="The full Name should has at least 1 character.";
+                etFName.setError("The full Name should has at least 1 character.");
             }
             if(etPW.getText().length()<1){
-                info+="The password should has at least 1 character.";
+                etPW.setError("The password should has at least 1 character.");
             }
-            Toast.makeText(getActivity(), info, Toast.LENGTH_LONG).show();
         }
     }
     public static String SHARED_PREF = "my_sharedpref";

@@ -21,31 +21,30 @@
             android:layout_gravity="right"
             android:text="I already have an account" />
 
-        <TextView
-            android:id="@+id/textViewCName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="7dp"
-            android:text="Your character name:"
-            android:layout_gravity="left"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/editTextCName"
+            <!-- Email Label -->
+            <android.support.design.widget.TextInputLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:imeOptions="flagNoFullscreen|actionDone"
-                android:singleLine="true"
-                android:text="" />
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/editTextCName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="Your character name"
+                    android:imeOptions="flagNoFullscreen|actionDone"
+                    android:inputType="textPersonName" />
+            </android.support.design.widget.TextInputLayout>
+
 
             <CheckedTextView
                 android:id="@+id/checkAvailable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_weight="1"
                 android:checked="false"
                 android:text="Available?"
@@ -53,39 +52,37 @@
         </LinearLayout>
 
 
-        <TextView
-            android:id="@+id/textViewFName"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="7dp"
-            android:text="Full name: (Private, not listed):" />
-        <EditText
-            android:id="@+id/editTextFName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:imeOptions="flagNoFullscreen|actionDone"
-            android:singleLine="true"
+            android:layout_height="wrap_content">
 
-            android:text=""/>
+            <EditText
+                android:id="@+id/editTextFName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Full name: (Private, not listed):"
+                android:imeOptions="flagNoFullscreen|actionDone"
+                android:inputType="textPersonName"
+                android:singleLine="true" />
+        </android.support.design.widget.TextInputLayout>
 
 
-        <TextView
-            android:id="@+id/textViewPW"
+        <!-- Password Label -->
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="7dp"
-            android:text="Choose a password:" />
-        <EditText
-            android:id="@+id/editTextPW"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:singleLine="true"
-            android:ems="10"
-            android:imeOptions="flagNoFullscreen|actionDone"
-            android:inputType="textPassword"
-            android:text=""/>
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+            <EditText android:id="@+id/editTextPW"
+                android:layout_weight="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:singleLine="true"
+                android:ems="10"
+                android:imeOptions="flagNoFullscreen|actionDone"
+                android:hint="Choose a password:"/>
+        </android.support.design.widget.TextInputLayout>
 
 
         <TextView
