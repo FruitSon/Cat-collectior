@@ -22,7 +22,6 @@ public class MyVolleySingleton {
     private MyVolleySingleton(Context context) {
         mCtx = context;
         mRequestQueue = getRequestQueue();
-
         mImageLoader = new ImageLoader(mRequestQueue,
                 new ImageLoader.ImageCache() {
                     private final LruCache<String, Bitmap>
@@ -46,7 +45,7 @@ public class MyVolleySingleton {
         }
         return mInstance;
     }
-
+    //get the request queue
     public RequestQueue getRequestQueue() {
         if (mRequestQueue == null) {
             // getApplicationContext() is key, it keeps you from leaking the
@@ -59,7 +58,7 @@ public class MyVolleySingleton {
     public <T> void addToRequestQueue(Request<T> req) {
         getRequestQueue().add(req);
     }
-
+    //not use right now
     public ImageLoader getImageLoader() {
         return mImageLoader;
     }

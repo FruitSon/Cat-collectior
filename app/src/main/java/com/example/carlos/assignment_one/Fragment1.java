@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.util.Log;
 
-public class Fragment1 extends android.support.v4.app.Fragment {
+public class Fragment1 extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater,

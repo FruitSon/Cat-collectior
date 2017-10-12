@@ -29,7 +29,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
-                android:hint="User Name" />
+                android:hint="User Name"
+                android:textColorHint="@color/light_grey"
+                android:textColor="#ffffff"/>
         </android.support.design.widget.TextInputLayout>
 
         <!-- Password Label -->
@@ -42,7 +44,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
-                android:hint="Password"/>
+                android:hint="Password"
+                android:textColorHint="@color/light_grey"
+                android:textColor="#ffffff"/>
         </android.support.design.widget.TextInputLayout>
 
         <android.support.v7.widget.AppCompatButton
@@ -60,7 +64,8 @@
             android:layout_marginBottom="24dp"
             android:text="Create a new account"
             android:gravity="center"
-            android:textSize="16dip"/>
+            android:textSize="16dip"
+            android:textColor="@color/light_grey"/>
 
     </LinearLayout>
 </ScrollView>

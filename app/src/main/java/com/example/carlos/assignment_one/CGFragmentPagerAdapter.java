@@ -1,8 +1,9 @@
 package com.example.carlos.assignment_one;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.support.v13.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
 
@@ -23,12 +24,12 @@ public class CGFragmentPagerAdapter extends FragmentPagerAdapter {
         super(mFragmentManager);
         mFragmentList = fragmentList;
     }
-    public CGFragmentPagerAdapter(FragmentManager mFragmentManager,
-                                     ArrayList<Fragment> fragmentList, String[] titles) {
-        super(mFragmentManager);
-        mFragmentList = fragmentList;
-        this.mTitles = titles;
-    }
+//    public CGFragmentPagerAdapter(FragmentManager mFragmentManager,
+//                                     ArrayList<Fragment> fragmentList, String[] titles) {
+//        super(mFragmentManager);
+//        mFragmentList = fragmentList;
+//        this.mTitles = titles;
+//    }
 
     @Override
     public Fragment getItem(int position) {

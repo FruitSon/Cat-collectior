@@ -4,7 +4,9 @@ package com.example.carlos.assignment_one;
 import android.app.DialogFragment;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -18,6 +20,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -35,6 +38,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.net.URLEncoder;
 import java.util.HashMap;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
@@ -50,6 +54,7 @@ public class Fragment_Settings extends Fragment {
     private static final String URI_INSTANCE_STATE_KEY = "saved_uri";
 
     //private OnFragmentInteractionListener mListener;
+    //views on the screen
     View view;
     ImageView btn;
     Button longButton;
@@ -57,6 +62,7 @@ public class Fragment_Settings extends Fragment {
     EditText etCName;
     EditText etFName;
     EditText etPW;
+    CheckedTextView nameAvailable;
 
     InputMethodManager mImm;
     String pwd_first_time = " ";
@@ -67,24 +73,35 @@ public class Fragment_Settings extends Fragment {
     TextView popMatch;
     EasyDialog ed;
 
+    //class memebers to follow if name is available and password confirmed
     private boolean isNameValid=false;
     private boolean isPasswordValid=false;
+    //local storage path
+    public static String SHARED_PREF = "my_sharedpref";
+    public static String INTERNAL_FILE = "internal-file";
 
-
+    //take the photo
     public void onClickImageButton(){
         ((SignupActivity)getActivity()).onClickImageButtonSetting();
     }
-
+    //after clicking the 'clear' or 'I already have an account' button, calling this function
     public void onClickLongButton(){
         if(longButton.getText()=="Clear"){
             etCName.setText("");
             etFName.setText("");
             etPW.setText("");
             btn.setImageResource(0);
+            etCName.setError(null);
+            etFName.setError(null);
+            etPW.setError(null);
+            nameAvailable.setText("Available?");
+            nameAvailable.setTextColor(Color.parseColor("#000000"));
+            saveButton.setClickable(false);
         }
     }
+    //after clicking the save button, check if input is valid and do the save job
     public void onClickSaveButton(){
-        if(etCName.getText().length()>0&&isNameValid&&etFName.getText().length()>0&&etPW.getText().length()>0){
+        if(etCName.getText().length()>0&&isNameValid&&isPasswordValid&&etFName.getText().length()>0&&etPW.getText().length()>0){
             //save
             //the judgement above is not definite
             saveData();
@@ -103,16 +120,18 @@ public class Fragment_Settings extends Fragment {
             }
             if(etPW.getText().length()<1){
                 etPW.setError("The password should has at least 1 character.");
+            }else if(!isPasswordValid){
+                etPW.setError("The password is not confirmed yet.");
             }
         }
     }
-    public static String SHARED_PREF = "my_sharedpref";
-    public static String INTERNAL_FILE = "internal-file";
-
+    //save the data on local storage and on the server
     private void saveData(){
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("name", etCName.getText().toString());
         params.put("password", etPW.getText().toString());
+        Log.d("pwd into sq, sign up",URLEncoder.encode(etPW.getText().toString()));
+        params.put("fName",etFName.getText().toString());
         JsonObjectRequest req = new JsonObjectRequest(saveProfileUrl, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -137,8 +156,8 @@ public class Fragment_Settings extends Fragment {
         SharedPreferences sp = getActivity().getSharedPreferences(SHARED_PREF, 0);
         SharedPreferences.Editor editor = sp.edit();
         editor.putString("cName", etCName.getText().toString());
+        editor.putString("pW", URLEncoder.encode(etPW.getText().toString()));
         editor.putString("fName", etFName.getText().toString());
-        editor.putString("pW", etPW.getText().toString());
 
         btn.buildDrawingCache(true);
         btn.buildDrawingCache();
@@ -151,6 +170,8 @@ public class Fragment_Settings extends Fragment {
         }
         editor.apply();
     }
+
+    //loading the data from local storage
     private void loadData(){
         SharedPreferences sp = getActivity().getSharedPreferences(SHARED_PREF, 0);
         etCName.setText(sp.getString("cName",""));
@@ -163,6 +184,7 @@ public class Fragment_Settings extends Fragment {
             btn.setImageDrawable(Drawable.createFromStream(bais2,  "imagByte"));
         }
 
+
         if (sp.getString("productImg","").equals("")&&etCName.getText().length() < 1 && etFName.getText().length() < 1 && etPW.getText().length() < 1) {
             if (longButton.getText() != "I already have an account")
                 longButton.setText("I already have an account");
@@ -171,14 +193,16 @@ public class Fragment_Settings extends Fragment {
                 longButton.setText("Clear");
         }
     }
-
+    //when the fragment's view is created, do the binding job and set the listener
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         //---Inflate the layout for this fragment---
         Log.d("Fragment Settings", "onCreateView");
-
+        //get the fragment view
         view = inflater.inflate(R.layout.fragment_fragment_settings, container, false);
+        nameAvailable = view.findViewById(R.id.checkAvailable);
+
         btn = view.findViewById(R.id.imageButton);
         mImm = (InputMethodManager) getActivity().getSystemService(INPUT_METHOD_SERVICE);
 
@@ -197,7 +221,7 @@ public class Fragment_Settings extends Fragment {
             }
         });
 
-
+        //when the 3 EditText input changes, calling the function in the TextWatcher
         TextWatcher mTextW = new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -207,6 +231,10 @@ public class Fragment_Settings extends Fragment {
                 } else {
                     if (longButton.getText() != "Clear")
                         longButton.setText("Clear");
+                }
+                if(etCName.getText().length()<1){
+                    nameAvailable.setText("Available?");
+                    nameAvailable.setTextColor(Color.parseColor("#000000"));
                 }
             }
 
@@ -230,6 +258,7 @@ public class Fragment_Settings extends Fragment {
         TextView.OnEditorActionListener mEditorActionListener = new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                Log.d("s", actionId+"");
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     if (view != null)
                         view.clearFocus();
@@ -259,10 +288,14 @@ public class Fragment_Settings extends Fragment {
                                         String res= response.getString("avail");
                                         if(res.equals("false")){
                                             etCName.setError("The name is not available");
+                                            nameAvailable.setText("Available?");
+                                            nameAvailable.setTextColor(Color.parseColor("#000000"));
                                             isNameValid=false;
                                         }else if(res.equals("true")){
                                             isNameValid=true;
                                             //message to user is not yet display
+                                            nameAvailable.setText("Available~~~~~~~~~~");
+                                            nameAvailable.setTextColor(Color.parseColor("#08e98f"));
                                         }
                                     } catch (JSONException e) {
                                         e.printStackTrace();
@@ -365,9 +398,11 @@ public class Fragment_Settings extends Fragment {
                                     popMatch.setText(getResources().getText(R.string.pwd_not_match));
                                     popText.setText("");
                                     updateButtonStatus(false);
+                                    isPasswordValid=false;
                                 } else {
                                     ed.dismiss();
                                     updateButtonStatus(true);
+                                    isPasswordValid=true;
                                 }
                             }
                         });
@@ -412,7 +447,7 @@ public class Fragment_Settings extends Fragment {
         }
 
     }
-
+    //set the longbutton's text to "Clear"
     public void setClear(){
         if (longButton.getText() != "Clear")
             longButton.setText("Clear");
