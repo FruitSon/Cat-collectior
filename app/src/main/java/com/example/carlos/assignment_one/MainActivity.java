@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements ConfirmDialog.Dia
     //initialize the tablayout and fragments in it
     private void CGInitViews() {
         ArrayList<Fragment> fragments = new ArrayList<>();
-        fragments.add(new Fragment1());
+        fragments.add(new PlayFragment());
         fragments.add(new Fragment1());//these 3 now do not have any function now
         fragments.add(new Fragment1());
         fragments.add(new PrefsFragment());

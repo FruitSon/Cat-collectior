@@ -8,6 +8,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -30,6 +33,10 @@
         <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".SignupActivity"/>
+        <activity android:name=".MapActivity"/>
+        <activity android:name=".PetSuccessActivity"/>
+
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyDhTfMLI7rDSMfpMV8HiaVzVTfjzVohbOQ"/>
     </application>
 
 </manifest>
