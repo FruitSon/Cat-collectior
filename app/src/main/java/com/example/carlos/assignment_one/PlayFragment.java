@@ -1,9 +1,16 @@
 package com.example.carlos.assignment_one;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,7 +66,9 @@ public class PlayFragment extends Fragment {
 
     @Override
     public void onAttach(Context context) {
+
         super.onAttach(context);
+
     }
 
     @Override
@@ -73,6 +82,15 @@ public class PlayFragment extends Fragment {
         Intent intent = new Intent(getActivity(),MapActivity.class);
         startActivityForResult(intent, REQUEST_MAP);
     }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+    }
+
+
+
+
 
 
 }

@@ -16,5 +16,7 @@
     <string name="theGreen_x">43.70805181058869</string>
     <string name="theGreen_y">-72.28422369807957</string>
     <string name="GuideWord">Try to click the markers!</string>
+    <string name="AgainButtonName">AGAIN</string>
+    <string name="DoneButtonName">DONE</string>
 
 </resources>
