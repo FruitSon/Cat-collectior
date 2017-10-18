@@ -120,7 +120,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
-    boolean trial=true;
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -164,19 +163,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng p0) {
-                if( p0 != null ) {
-                    Log.d("Map", p0.toString());
-                    mMap.addMarker(new MarkerOptions().position(p0).title(p0.toString())
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_grey)));
-                }
-                if(trial) {
-                    viewSwitcher.showNext();
-                    trial=false;
-                }else{
+                if(lastMarker!=null) {
+                    lastMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_grey));
+                    lastMarker = null;
                     viewSwitcher.showPrevious();
-                    trial=true;
                 }
-
             }
         });
 
@@ -220,12 +211,15 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 lastMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_grey));
                 marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_green));
                 lastMarker = marker;
+                displaySignleCatInfo(marker.getSnippet());
             }else{
                 // do nothing because user click the same marker
             }
         }else{
+            viewSwitcher.showNext();
             marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_green));
             lastMarker = marker;
+            displaySignleCatInfo(marker.getSnippet());
         }
 
         return true;
@@ -342,7 +336,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                         Log.d("Get all cats Info",response);
                         Gson gson = new Gson();
                         catList = gson.fromJson(response, new TypeToken<List<CatInfo>>(){}.getType());
-                        DisplayAllTheCats();
+                        displayAllTheCats();
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -356,12 +350,31 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     }
 
-    private void DisplayAllTheCats(){
+    private void displayAllTheCats(){
         for(CatInfo cat:catList){
             LatLng catPos = new LatLng( cat.lat, cat.lng );
             mMap.addMarker(new MarkerOptions().position(catPos).title(cat.name).snippet(Integer.toString(cat.catId))
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_grey)));
         }
     }
+
+    private void displaySignleCatInfo(String catId){
+        Log.d("Cat Info","Choosed Cat id is "+catId);
+        int theCatId = Integer.parseInt(catId);
+        double distance=0;
+        for(CatInfo cat:catList){
+            if(cat.catId==theCatId){
+                distance= calculateDistance(myselfMarker.getPosition(),cat.lat,cat.lng);
+                catText.setText(cat.name+'\n'+Double.toString(distance));
+                    
+
+                break;
+            }
+        }
+    }
+    private double calculateDistance(LatLng myself, double catLat, double catLng){
+        return Math.sqrt( Math.pow((myself.latitude-catLat),2) + Math.pow((myself.longitude-catLng),2) );
+    }
+
 
 }
