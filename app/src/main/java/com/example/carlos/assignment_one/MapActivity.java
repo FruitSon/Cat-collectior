@@ -27,7 +27,9 @@ import android.widget.ViewSwitcher;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -36,11 +38,17 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener, GoogleMap.OnMarkerClickListener {
 
@@ -60,6 +68,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private Marker lastMarker;
     private Marker myselfMarker;
     private LocationManager locationManager;
+
+
+    private List<CatInfo> catList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,7 +160,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_self)));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(loc));
         mMap.moveCamera(CameraUpdateFactory.zoomTo(18f));
-
+        //!!!!!!!!!!!!!!!!!!!need to change
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng p0) {
@@ -297,33 +308,60 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         startActivityForResult(_intent,REQUEST_PET);
     }
 
+
     private void getAllCatsInfo(){
         SharedPreferences sp = getSharedPreferences(GlobalValue.SHARED_PREF, 0);
         String username = sp.getString("cName", "Null");
         String password = sp.getString("pW","Null");
         Log.d("Name and PW is",username+"    "+password);
         //check if the username and password are in the server
-        String url=getCatUrl+"?name="+ username+"&password="+password;
-        //+URLEncoder.encode(password);
-        JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+        String url=getCatUrl+"?name="+ username+"&password="+password+"&mode=easy";
+        Log.d("URL is",url);
 
+        /*
+        JsonArrayRequest jsArrayRequest= new JsonArrayRequest(Request.Method.GET, url,null,
+                new Response.Listener<JSONArray>() {
                     @Override
-                    public void onResponse(JSONObject response) {
-                        //mTxtDisplay.setText("Response: " + response.toString());
-
-                        Log.d("NAME Available check???",response.toString());
-
+                    public void onResponse(JSONArray response){
+                        Log.d("Get all cats Info",response.toString());
+                        Gson gson = new Gson();
+                        catList = gson.fromJson(response.toString(), new TypeToken<List<CatInfo>>(){}.getType());
+                        Log.d("Get all cats Info","for a pause");
                     }
                 }, new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO Auto-generated method stub
-                        Log.d("NAME Available check???","Error");
+                    public void onErrorResponse(VolleyError error){
+                        Log.d("Get all cats Info",error.toString());
                     }
-                });
+                });*/
 
-        MyVolleySingleton.getInstance(this).addToRequestQueue(jsObjRequest);
+        StringRequest strRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                        Log.d("Get all cats Info",response);
+                        Gson gson = new Gson();
+                        catList = gson.fromJson(response, new TypeToken<List<CatInfo>>(){}.getType());
+                        DisplayAllTheCats();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error){
+                Log.d("Get all cats Info",error.toString());
+            }
+        });
+
+
+        MyVolleySingleton.getInstance(this).addToRequestQueue(strRequest);
 
     }
+
+    private void DisplayAllTheCats(){
+        for(CatInfo cat:catList){
+            LatLng catPos = new LatLng( cat.lat, cat.lng );
+            mMap.addMarker(new MarkerOptions().position(catPos).title(cat.name).snippet(Integer.toString(cat.catId))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_grey)));
+        }
+    }
+
 }
