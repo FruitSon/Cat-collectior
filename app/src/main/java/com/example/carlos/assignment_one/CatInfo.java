@@ -1,5 +1,7 @@
 package com.example.carlos.assignment_one;
 
+import android.graphics.Bitmap;
+
 /**
  * Created by Carlos on 17/10/18.
  */

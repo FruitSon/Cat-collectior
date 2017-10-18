@@ -53,6 +53,18 @@
                 android:layout_height="match_parent"
                 android:gravity="left"
                 android:orientation="horizontal">
+
+                <com.android.volley.toolbox.NetworkImageView
+                    android:id="@+id/catImg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="20dp"
+                    android:src="@android:drawable/sym_def_app_icon"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerCrop"/>
+                <!--
                 <ImageView
                     android:id="@+id/catImg"
                     android:layout_width="wrap_content"
@@ -61,6 +73,7 @@
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="20dp"
                     android:src="@android:drawable/sym_def_app_icon" />
+                    -->
 
                 <TextView
                     android:id="@+id/catText"
@@ -79,7 +92,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right|center_vertical"
                 android:layout_margin="5dp"
-                android:background="#ce37e6"
+                android:background="@color/btn_enable_purple"
                 android:text="PAT"
                 android:textColor="#ffffff"/>
 

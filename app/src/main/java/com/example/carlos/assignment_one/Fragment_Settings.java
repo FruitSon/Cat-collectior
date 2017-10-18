@@ -132,6 +132,7 @@ public class Fragment_Settings extends Fragment {
         params.put("password", etPW.getText().toString());
         Log.d("pwd into sq, sign up",URLEncoder.encode(etPW.getText().toString()));
         params.put("fName",etFName.getText().toString());
+        params.put("score","0");
         JsonObjectRequest req = new JsonObjectRequest(saveProfileUrl, new JSONObject(params),
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -158,6 +159,7 @@ public class Fragment_Settings extends Fragment {
         editor.putString("cName", etCName.getText().toString());
         editor.putString("pW", URLEncoder.encode(etPW.getText().toString()));
         editor.putString("fName", etFName.getText().toString());
+        editor.putString("score","0");
 
         btn.buildDrawingCache(true);
         btn.buildDrawingCache();

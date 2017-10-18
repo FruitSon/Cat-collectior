@@ -200,8 +200,14 @@ public class LoginActivity extends AppCompatActivity {
             if(response.getString("fName")!=null){
                 editor.putString("fName", response.getString("fName"));
             }
-            if(response.getString("link")!=null)
+            if(response.getString("link")!=null) {
                 editor.putString("link", response.getString("link"));
+            }
+            if(response.getString("score")!=null) {
+                editor.putString("score", response.getString("score"));
+            }else{
+                editor.putString("score", "0");
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
