@@ -36,7 +36,7 @@
         <activity android:name=".MapActivity"/>
         <activity android:name=".PetSuccessActivity"/>
 
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyDhTfMLI7rDSMfpMV8HiaVzVTfjzVohbOQ"/>
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyCSZfPacklSzGpCfNGOucVSZvW7hD8OBrs"/>
     </application>
 
 </manifest>

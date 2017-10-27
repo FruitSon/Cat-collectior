@@ -204,9 +204,9 @@ public class LoginActivity extends AppCompatActivity {
                 editor.putString("link", response.getString("link"));
             }
             if(response.getString("score")!=null) {
-                editor.putString("score", response.getString("score"));
+                editor.putInt("score", Integer.parseInt(response.getString("score")));
             }else{
-                editor.putString("score", "0");
+                editor.putInt("score", 0);
             }
         } catch (JSONException e) {
             e.printStackTrace();

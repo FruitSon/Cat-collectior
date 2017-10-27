@@ -7,20 +7,18 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -28,9 +26,6 @@ import android.widget.ViewSwitcher;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageRequest;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
 import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -38,22 +33,19 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.net.URLEncoder;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-public class MapActivity extends FragmentActivity implements OnMapReadyCallback, LocationListener, GoogleMap.OnMarkerClickListener {
+public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
+        LocationListener, GoogleMap.OnMarkerClickListener{
 
     private static final String getCatUrl = "http://cs65.cs.dartmouth.edu/catlist.pl";
     private static final String patCatUrl = "http://cs65.cs.dartmouth.edu/pat.pl";
@@ -73,6 +65,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private Marker myselfMarker;
     private LocationManager locationManager;
 
+
+    private int visible_radius;
+    private List<Marker> catMarkers;
 
     private List<CatInfo> catList;
 
@@ -111,6 +106,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             }
         });
 
+        SharedPreferences sp = getSharedPreferences(GlobalValue.SHARED_PREF, 0);
+        visible_radius = sp.getInt("radius",200);
+        Log.d("visible_radius",visible_radius+"");
+        catMarkers = new LinkedList<>();
         getAllCatsInfo();
 
     }
@@ -175,6 +174,21 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             }
         });
 
+        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+            @Override
+            public void onCameraMove() {
+                LatLngBounds bounds;
+                if(lastMarker!=null && mMap!=null) {
+                    bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+                    if(!bounds.contains(lastMarker.getPosition())){
+                        lastMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_grey));
+                        lastMarker = null;
+                        viewSwitcher.showPrevious();
+                    }
+                }
+            }
+        });
+
         mMap.setOnMarkerClickListener(this);
     }
 
@@ -184,12 +198,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         Toast.makeText(this, "LOC: " + location.getLatitude() + " " + location.getLongitude(),
                 Toast.LENGTH_LONG).show();
 
+        displayAllTheCats();
         LatLng newPoint = new LatLng( location.getLatitude(), location.getLongitude());
         mMap.moveCamera(CameraUpdateFactory.newLatLng(newPoint));
         mMap.moveCamera(CameraUpdateFactory.zoomTo(17f));
         myselfMarker.setPosition(newPoint);
-
+        updateVisiblity();
     }
+
 
     @Override
     public void onProviderDisabled(String provider){
@@ -356,7 +372,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
     //update the score because of patting the cat successfully
     private void updateScore(){
-
+        SharedPreferences sp = getSharedPreferences(GlobalValue.SHARED_PREF, 0);
+        int cur_score = sp.getInt("score",0)+1;
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putInt("score",cur_score);
+        editor.apply();
     }
 
 
@@ -377,6 +397,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                         Gson gson = new Gson();
                         catList = gson.fromJson(response, new TypeToken<List<CatInfo>>(){}.getType());
                         displayAllTheCats();
+                        updateVisiblity();
                     }
                 }, new Response.ErrorListener() {
                     @Override
@@ -393,9 +414,18 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     private void displayAllTheCats(){
         for(CatInfo cat:catList){
-            LatLng catPos = new LatLng( cat.lat, cat.lng );
-            mMap.addMarker(new MarkerOptions().position(catPos).title(cat.name).snippet(Integer.toString(cat.catId))
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_grey)));
+            LatLng catPos = new LatLng(cat.lat, cat.lng);
+            Marker temp = mMap.addMarker(new MarkerOptions().position(catPos).title(cat.name).snippet(Integer.toString(cat.catId))
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_grey)));
+            catMarkers.add(temp);
+        }
+    }
+
+    private void updateVisiblity(){
+        for(Marker m: catMarkers){
+            if(calculateDistance(myselfMarker.getPosition(),m.getPosition().latitude,m.getPosition().longitude)>visible_radius) {
+                m.setVisible(false);
+            }
         }
     }
 
@@ -420,11 +450,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    private double calculateDistance(LatLng myself, double catLat, double catLng){
-        float[] results=new float[1];
-        Location.distanceBetween(myself.latitude,myself.longitude,catLat,catLng,results);
+    private double calculateDistance(LatLng myself, double catLat, double catLng) {
+        float[] results = new float[1];
+        Location.distanceBetween(myself.latitude, myself.longitude, catLat, catLng, results);
         return results[0];
     }
-
-
 }

@@ -16,9 +16,13 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.Marker;
+
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements ConfirmDialog.DialogListener {
+public class MainActivity extends AppCompatActivity implements
+        ConfirmDialog.DialogListener{
 
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
@@ -78,4 +82,7 @@ public class MainActivity extends AppCompatActivity implements ConfirmDialog.Dia
     public void onDialogNegativeClick(DialogFragment dialog) {
         Log.d("MAIN", "negative clicked");
     }
+
+
+
 }

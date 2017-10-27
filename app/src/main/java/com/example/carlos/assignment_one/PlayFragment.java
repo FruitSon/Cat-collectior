@@ -50,7 +50,7 @@ public class PlayFragment extends Fragment {
 
         SharedPreferences sp = getActivity().getSharedPreferences(GlobalValue.SHARED_PREF, 0);
         welcomeName.setText("Hi, "+sp.getString("fName","You")+"!");
-        welcomeCat.setText("Now you have "+sp.getString("score","0")+" cats");
+        welcomeCat.setText("Now you have "+sp.getInt("score",0)+" cats");
 
         goPlayButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,8 +58,6 @@ public class PlayFragment extends Fragment {
                 playButtonClick();
             }
         });
-
-
 
         return view;
     }

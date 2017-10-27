@@ -36,19 +36,19 @@ import java.io.ByteArrayInputStream;
 
 public class PrefsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    public  String SETTINGS_NICKNAME_KEY = "reNickname";
-    public  String SETTINGS_HOBBY_KEY = "reHobby";
-    public  String SETTINGS_PRIVACY_KEY = "settings_privacy";
-    public  String SETTINGS_ALERT_KEY = "settings_alert";
-    public  String SETTINGS_ALERT_RING_KEY = "settings_alert_v";
-    public  String SETTINGS_ALERT_VIBERATE_KEY = "settings_alert_r";
-    public  String SETTINGS_ABOUT_KEY = "settings_link";
-
+    private  String SETTINGS_NICKNAME_KEY = "reNickname";
+    private  String SETTINGS_HOBBY_KEY = "reHobby";
+    private  String SETTINGS_PRIVACY_KEY = "settings_privacy";
+    private  String SETTINGS_ALERT_KEY = "settings_alert";
+    private  String SETTINGS_ALERT_RING_KEY = "settings_alert_v";
+    private  String SETTINGS_ALERT_VIBERATE_KEY = "settings_alert_r";
+    private  String SETTINGS_ABOUT_KEY = "settings_link";
+    private  String SETTINGS_RADIUS_KEY = "settings_radius";
     //view of the screen
     TextView mName, mNickname;
     ImageView mPortrait;
     Button mLogout;
-    Preference pNickname,pAbout,pPassword;
+    Preference pNickname,pAbout,pPassword,pRadius;
     SwitchPreference pAlert;
     CheckBoxPreference pPrivacy,pAlert_vibrate,pAlert_ring;
     SharedPreferences sharedPreferences;
@@ -119,6 +119,7 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
     private void initPreferences() {
         pNickname = findPreference(SETTINGS_NICKNAME_KEY);
         pPassword = findPreference(SETTINGS_HOBBY_KEY);
+        pRadius = findPreference(SETTINGS_RADIUS_KEY);
         pPrivacy = (CheckBoxPreference) findPreference(SETTINGS_PRIVACY_KEY);
         pAlert = (SwitchPreference) findPreference(SETTINGS_ALERT_KEY);
         pAlert_vibrate = (CheckBoxPreference) findPreference(SETTINGS_ALERT_VIBERATE_KEY);
@@ -212,6 +213,15 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
             Toast.makeText(getActivity(),"You have update your profile.",
                     Toast.LENGTH_SHORT).show();
             updateProfile();
+        }
+        else if(s.equals(SETTINGS_RADIUS_KEY)){
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putInt("radius",Integer.parseInt(sharedPreferences.getString(SETTINGS_RADIUS_KEY,200+"")));
+            editor.apply();
+            Log.d("radius set",sp.getInt("radius",200)+"");
+            pRadius.setSummary(sharedPreferences.getString(SETTINGS_RADIUS_KEY,200+"")+"m");
+            Toast.makeText(getActivity(),"You have update your profile.",
+                    Toast.LENGTH_SHORT).show();
         }
 
     }

@@ -62,6 +62,13 @@
             android:dialogTitle="Please enter link to your personal website or Dartmouth CS"
             android:summary="No saved link yet"
             android:singleLine="true"/>
+
+        <EditTextPreference
+            android:key="settings_radius"
+            android:title="Detectable range"
+            android:dialogTitle="Please enter the radius of detectable range, default is 200 meter"
+            android:summary="200m"
+            android:singleLine="true"/>
     </PreferenceCategory>
 </PreferenceScreen>
 
