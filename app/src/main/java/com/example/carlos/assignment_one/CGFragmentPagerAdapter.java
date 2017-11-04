@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 public class CGFragmentPagerAdapter extends FragmentPagerAdapter {
 
-    private String[] mTitles = new String[]{"Play", "History", "Ranking","Settings"};
+    private String[] mTitles = new String[]{"Play", "History","Settings"};
     private ArrayList<Fragment> mFragmentList = null;
 
     public CGFragmentPagerAdapter(FragmentManager fm) {

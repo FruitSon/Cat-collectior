@@ -466,6 +466,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                         Log.d("Get all cats Info",response);
                         Gson gson = new Gson();
                         catList = gson.fromJson(response, new TypeToken<List<CatInfo>>(){}.getType());
+                        int score = 0;
+                        for(CatInfo cat:catList){
+                            if(cat.petted) score++;
+                        }
+                        SharedPreferences sp = getSharedPreferences(GlobalValue.SHARED_PREF, 0);
+                        sp.edit().putInt("score",score);
+                        sp.edit().apply();
                         displayAllTheCats();
                         updateVisiblity();
                     }
