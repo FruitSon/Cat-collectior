@@ -42,7 +42,15 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="20dp"/>
-
+    
+    <!--<Button-->
+        <!--android:id="@+id/GoPlayButton"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="@color/btn_disable"-->
+        <!--android:textColor="#ffffff"-->
+        <!--android:text="Reset"-->
+        <!--android:layout_weight="7" />-->
 </LinearLayout>
 
 

@@ -48,8 +48,7 @@ public class MainActivity extends AppCompatActivity implements
     private void CGInitViews() {
         ArrayList<Fragment> fragments = new ArrayList<>();
         fragments.add(new PlayFragment());
-        fragments.add(new Fragment1());//these 3 now do not have any function now
-        fragments.add(new Fragment1());
+        fragments.add(new HistoryFragment());//these 3 now do not have any function now
         fragments.add(new PrefsFragment());
 
         //bind viewPager to pagerAdapater

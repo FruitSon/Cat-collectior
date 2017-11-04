@@ -197,16 +197,11 @@ public class LoginActivity extends AppCompatActivity {
             editor.putString("cName", username);
             editor.putString("pW", URLEncoder.encode(password));
             Log.d("password put into sp",URLEncoder.encode(password));
-            if(response.getString("fName")!=null){
-                editor.putString("fName", response.getString("fName"));
+            if(response.getString("full_name")!=null){
+                editor.putString("fName", response.getString("full_name"));
             }
             if(response.getString("link")!=null) {
                 editor.putString("link", response.getString("link"));
-            }
-            if(response.getString("score")!=null) {
-                editor.putInt("score", Integer.parseInt(response.getString("score")));
-            }else{
-                editor.putInt("score", 0);
             }
         } catch (JSONException e) {
             e.printStackTrace();
