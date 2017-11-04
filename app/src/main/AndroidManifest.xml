@@ -35,6 +35,7 @@
         <activity android:name=".SignupActivity"/>
         <activity android:name=".MapActivity"/>
         <activity android:name=".PetSuccessActivity"/>
+        <activity android:name="com.varunmishra.catcameraoverlay.CameraViewActivity"/>
 
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyDhTfMLI7rDSMfpMV8HiaVzVTfjzVohbOQ"/>
     </application>

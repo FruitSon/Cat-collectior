@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -362,65 +364,30 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 Config.catLatitude = choosedCat.lat;
                 Config.catLongitude = choosedCat.lng;
                 Config.locDistanceRange = 30;
-                Config.useLocationFilter = false; // use this only for testing. This should be true in the final app.
+                Config.useLocationFilter = true; // use this only for testing. This should be true in the final app.
                 Config.onCatPetListener = this;
+                Bitmap tmp = ((BitmapDrawable)catImg.getDrawable()).getBitmap();
+                Config.catImage = Bitmap.createScaledBitmap(tmp, 300, 300, false);
                 Intent i = new Intent(this, CameraViewActivity.class);
                 startActivity(i);
             }
         }
-        /*
-        if(lastMarker!=null) {
-            //pat.pl?name=sergey&password=1234&catid=1&lat=74.2523&lng=74.2134
-            String catId = lastMarker.getSnippet();
-            String myLat = Double.toString(myselfMarker.getPosition().latitude);
-            String myLng = Double.toString(myselfMarker.getPosition().longitude);
-            SharedPreferences sp = getSharedPreferences(GlobalValue.SHARED_PREF, 0);
-            String username = sp.getString("cName", "Null");
-            String password = sp.getString("pW", "Null");
-            //String url = patCatUrl + "?name=" + username + "&password=" + password + "&catid=" +catId+"&lat="+myLat
-              //      + "&lng="+myLng;
-            String url = patCatUrl + "?name=" + username + "&password=" + password + "&catid=" +catId+"&lat="+Double.toString(lastMarker.getPosition().latitude)
-                    + "&lng="+Double.toString(lastMarker.getPosition().longitude);
-
-            StringRequest strRequest = new StringRequest(Request.Method.GET, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response){
-                            Log.d("Pat Cat",response);
-                            Gson gson = new Gson();
-                            patCatResponse result = gson.fromJson(response, patCatResponse.class);
-                            if(result.status.equals("OK")){
-                                startSuccessActivity(result.catId);
-                            }else{
-                                Toast.makeText(getBaseContext(), result.reason, Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error){
-                            Log.d("Pat Cat",error.toString());
-                        }
-                    }
-            );
-            MyVolleySingleton.getInstance(this).addToRequestQueue(strRequest);
-
-        }*/
     }
 
     //When cat is petted successfully
     @Override
     public void onCatPet(String catName) {
-        Toast.makeText(this,"You just Pet - " + catName, Toast.LENGTH_LONG).show();
+        //Toast.makeText(this,"You just Pet - " + catName, Toast.LENGTH_LONG).show();
         if(choosedCat!=null) {
             String myLat = Double.toString(myselfMarker.getPosition().latitude);
             String myLng = Double.toString(myselfMarker.getPosition().longitude);
             SharedPreferences sp = getSharedPreferences(GlobalValue.SHARED_PREF, 0);
             String username = sp.getString("cName", "Null");
             String password = sp.getString("pW", "Null");
-            //String url = patCatUrl + "?name=" + username + "&password=" + password + "&catid=" +catId+"&lat="+myLat
-            //      + "&lng="+myLng;
-            String url = patCatUrl + "?name=" + username + "&password=" + password + "&catid=" +Integer.toString(choosedCat.catId)+"&lat="
-                    +Double.toString(lastMarker.getPosition().latitude) + "&lng="+Double.toString(lastMarker.getPosition().longitude);
+            String url = patCatUrl + "?name=" + username + "&password=" + password + "&catid=" +Integer.toString(choosedCat.catId)+"&lat="+myLat
+                  + "&lng="+myLng;
+            //String url = patCatUrl + "?name=" + username + "&password=" + password + "&catid=" +Integer.toString(choosedCat.catId)+"&lat="
+              //      +Double.toString(lastMarker.getPosition().latitude) + "&lng="+Double.toString(lastMarker.getPosition().longitude);
 
             StringRequest strRequest = new StringRequest(Request.Method.GET, url,
                     new Response.Listener<String>() {
@@ -430,6 +397,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                             Gson gson = new Gson();
                             patCatResponse result = gson.fromJson(response, patCatResponse.class);
                             if(result.status.equals("OK")){
+                                //set it back to null
+                                choosedCat=null;
+                                //start the success activity
                                 startSuccessActivity(result.catId);
                             }else{
                                 Toast.makeText(getBaseContext(), result.reason, Toast.LENGTH_LONG).show();
@@ -439,13 +409,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 @Override
                 public void onErrorResponse(VolleyError error){
                     Log.d("Pat Cat",error.toString());
+                    Toast.makeText(getBaseContext(),"Network Error, Please pet again!!", Toast.LENGTH_LONG).show();
                 }
             }
             );
             MyVolleySingleton.getInstance(this).addToRequestQueue(strRequest);
         }
-        //set it back to null
-        choosedCat=null;
     }
 
 
