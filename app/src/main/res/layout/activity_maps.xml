@@ -40,7 +40,6 @@
                 android:text="@string/GuideWord"
                 android:textSize="25dp" />
         </LinearLayout>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -64,16 +63,7 @@
                     android:src="@android:drawable/sym_def_app_icon"
                     android:adjustViewBounds="true"
                     android:scaleType="centerCrop"/>
-                <!--
-                <ImageView
-                    android:id="@+id/catImg"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="20dp"
-                    android:src="@android:drawable/sym_def_app_icon" />
-                    -->
+
 
                 <TextView
                     android:id="@+id/catText"
@@ -84,19 +74,37 @@
                     android:text="Coco\n0.21 mi"
                     android:textSize="20dp" />
             </LinearLayout>
-
-            <Button
-                android:id="@+id/patButton"
-                android:layout_width="wrap_content"
-                android:layout_weight="0.1"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right|center_vertical"
-                android:layout_margin="5dp"
-                android:background="@color/btn_enable_purple"
-                android:text="PAT"
-                android:textColor="#ffffff"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="match_parent"
+                android:gravity="right"
+                android:orientation="vertical">
+                <Button
+                    android:id="@+id/trackButton"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="0.1"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_margin="5dp"
+                    android:background="@color/btn_enable_green"
+                    android:text="TRACK"
+                    android:textColor="#ffffff"/>
+                <Button
+                    android:id="@+id/patButton"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="0.1"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_margin="5dp"
+                    android:background="@color/btn_enable_purple"
+                    android:text="PAT"
+                    android:textColor="#ffffff"/>
+            </LinearLayout>
 
         </LinearLayout>
+
+
     </ViewSwitcher>
 
 </LinearLayout>

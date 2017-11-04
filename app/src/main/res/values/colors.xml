@@ -6,7 +6,8 @@
     <color name="bkcolorLogin">#0d6e64</color>
     <color name="justforfun">#000000</color>
 
+    <color name="btn_enable_red">#e0f10d18</color>
 
     <color name="btn_enable_purple">#ce37e6</color>
-
+    <color name="btn_enable_green">#e00b580a</color>
 </resources>

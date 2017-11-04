@@ -18,15 +18,30 @@ import android.view.ViewGroup;
 import android.app.Fragment;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.net.URLEncoder;
 
 public class PlayFragment extends Fragment {
 
     private static final int REQUEST_MAP = 0;
 
+    private static final String resetUrl = "http://cs65.cs.dartmouth.edu/resetlist.pl";
+
+
     private View view;
     private TextView welcomeName;
     private TextView welcomeCat;
     private Button goPlayButton;
+    private Button resetButton;
 
     public PlayFragment() {
         // Required empty public constructor
@@ -47,6 +62,7 @@ public class PlayFragment extends Fragment {
         welcomeName = view.findViewById(R.id.WelcomeTextName);
         welcomeCat = view.findViewById(R.id.WelcomTextCat);
         goPlayButton = view.findViewById(R.id.GoPlayButton);
+        resetButton = view.findViewById(R.id.ResetButton);
 
         SharedPreferences sp = getActivity().getSharedPreferences(GlobalValue.SHARED_PREF, 0);
         welcomeName.setText("Hi, "+sp.getString("fName","You")+"!");
@@ -56,6 +72,13 @@ public class PlayFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 playButtonClick();
+            }
+        });
+
+        resetButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view){
+                resetButtonClick();
             }
         });
 
@@ -74,6 +97,12 @@ public class PlayFragment extends Fragment {
         super.onDetach();
     }
 
+
+    @Override
+    public void onStart(){
+        super.onStart();
+    }
+
     //get called when click the play button
     private void playButtonClick(){
         // Start the Map activity
@@ -81,9 +110,36 @@ public class PlayFragment extends Fragment {
         startActivityForResult(intent, REQUEST_MAP);
     }
 
-    @Override
-    public void onStart(){
-        super.onStart();
+    //get called when click the reset cat list button
+    private void resetButtonClick(){
+        SharedPreferences sp = getActivity().getSharedPreferences(GlobalValue.SHARED_PREF, 0);
+        String username = sp.getString("cName", "");
+        String password = sp.getString("pW", "");
+        //reset the cat
+        String url=resetUrl+"?name="+ URLEncoder.encode(username)+"&password="+URLEncoder.encode(password);
+        JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+                        Log.d("Reset the cat list", response.toString());
+
+                        if (!response.has("error")) {
+
+                        } else {
+                            Toast.makeText(getActivity().getApplicationContext(), "Reset cat list succeed", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // TODO Auto-generated method stub
+                        Log.d("Reset the cat list","Error");
+                    }
+                });
+
+        MyVolleySingleton.getInstance(getActivity()).addToRequestQueue(jsObjRequest);
     }
 
 

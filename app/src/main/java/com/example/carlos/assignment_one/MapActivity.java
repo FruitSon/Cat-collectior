@@ -41,11 +41,17 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+//varun library for cat image display
+import com.varunmishra.catcameraoverlay.CameraViewActivity;
+import com.varunmishra.catcameraoverlay.Config;
+import com.varunmishra.catcameraoverlay.OnCatPetListener;
+
+import java.sql.BatchUpdateException;
 import java.util.LinkedList;
 import java.util.List;
 
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
-        LocationListener, GoogleMap.OnMarkerClickListener{
+        LocationListener, GoogleMap.OnMarkerClickListener, OnCatPetListener{
 
     private static final String getCatUrl = "http://cs65.cs.dartmouth.edu/catlist.pl";
     private static final String patCatUrl = "http://cs65.cs.dartmouth.edu/pat.pl";
@@ -60,6 +66,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private NetworkImageView catImg;
     private TextView catText;
     Animation slide_in_left, slide_out_right;
+    private Button trackButton;
 
     private Marker lastMarker;
     private Marker myselfMarker;
@@ -98,11 +105,31 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         catImg = findViewById(R.id.catImg);
         catText = findViewById(R.id.catText);
         petButton = findViewById(R.id.patButton);
+        trackButton = findViewById(R.id.trackButton);
 
         petButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 petButtonClick();
+            }
+        });
+        trackButton.setText("TRACK");
+        trackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Button tmp = (Button) view;
+                if(tmp.getText()=="TRACK"){
+                    tmp.setText("STOP");
+                    tmp.setBackgroundColor(getResources().getColor(R.color.btn_enable_red));
+                    //start the track service
+                    trackButtonClick(1);
+                }else{
+                    tmp.setText("TRACK");
+                    tmp.setBackgroundColor(getResources().getColor(R.color.btn_enable_green));
+                    //stop the track service
+                    trackButtonClick(0);
+                }
+
             }
         });
 
@@ -318,8 +345,30 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
+    private CatInfo choosedCat=null;
     //get called when click the pet button
     private void petButtonClick(){
+        if(lastMarker!=null) {
+            //pat.pl?name=sergey&password=1234&catid=1&lat=74.2523&lng=74.2134
+            String choosedCatId = lastMarker.getSnippet();
+            for(CatInfo cat:catList){
+                if(cat.catId== Integer.parseInt(choosedCatId)){
+                    choosedCat=cat;
+                    break;
+                }
+            }
+            if(choosedCat!=null) {
+                Config.catName = choosedCat.name;
+                Config.catLatitude = choosedCat.lat;
+                Config.catLongitude = choosedCat.lng;
+                Config.locDistanceRange = 30;
+                Config.useLocationFilter = false; // use this only for testing. This should be true in the final app.
+                Config.onCatPetListener = this;
+                Intent i = new Intent(this, CameraViewActivity.class);
+                startActivity(i);
+            }
+        }
+        /*
         if(lastMarker!=null) {
             //pat.pl?name=sergey&password=1234&catid=1&lat=74.2523&lng=74.2134
             String catId = lastMarker.getSnippet();
@@ -328,8 +377,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             SharedPreferences sp = getSharedPreferences(GlobalValue.SHARED_PREF, 0);
             String username = sp.getString("cName", "Null");
             String password = sp.getString("pW", "Null");
-            String url = patCatUrl + "?name=" + username + "&password=" + password + "&catid=" +catId+"&lat="+myLat
-                    + "&lng="+myLng;
+            //String url = patCatUrl + "?name=" + username + "&password=" + password + "&catid=" +catId+"&lat="+myLat
+              //      + "&lng="+myLng;
+            String url = patCatUrl + "?name=" + username + "&password=" + password + "&catid=" +catId+"&lat="+Double.toString(lastMarker.getPosition().latitude)
+                    + "&lng="+Double.toString(lastMarker.getPosition().longitude);
 
             StringRequest strRequest = new StringRequest(Request.Method.GET, url,
                     new Response.Listener<String>() {
@@ -353,8 +404,58 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             );
             MyVolleySingleton.getInstance(this).addToRequestQueue(strRequest);
 
-        }
+        }*/
     }
+
+    //When cat is petted successfully
+    @Override
+    public void onCatPet(String catName) {
+        Toast.makeText(this,"You just Pet - " + catName, Toast.LENGTH_LONG).show();
+        if(choosedCat!=null) {
+            String myLat = Double.toString(myselfMarker.getPosition().latitude);
+            String myLng = Double.toString(myselfMarker.getPosition().longitude);
+            SharedPreferences sp = getSharedPreferences(GlobalValue.SHARED_PREF, 0);
+            String username = sp.getString("cName", "Null");
+            String password = sp.getString("pW", "Null");
+            //String url = patCatUrl + "?name=" + username + "&password=" + password + "&catid=" +catId+"&lat="+myLat
+            //      + "&lng="+myLng;
+            String url = patCatUrl + "?name=" + username + "&password=" + password + "&catid=" +Integer.toString(choosedCat.catId)+"&lat="
+                    +Double.toString(lastMarker.getPosition().latitude) + "&lng="+Double.toString(lastMarker.getPosition().longitude);
+
+            StringRequest strRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response){
+                            Log.d("Pat Cat",response);
+                            Gson gson = new Gson();
+                            patCatResponse result = gson.fromJson(response, patCatResponse.class);
+                            if(result.status.equals("OK")){
+                                startSuccessActivity(result.catId);
+                            }else{
+                                Toast.makeText(getBaseContext(), result.reason, Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error){
+                    Log.d("Pat Cat",error.toString());
+                }
+            }
+            );
+            MyVolleySingleton.getInstance(this).addToRequestQueue(strRequest);
+        }
+        //set it back to null
+        choosedCat=null;
+    }
+
+
+    //get called when click the track button
+    private void trackButtonClick(int onOff){//onOff==0 means stop tracking, onOff==1 means start tracking
+
+    }
+
+
+
     //start the success activity && update cat info in local memory (catList)
     private void startSuccessActivity(int patCatId){
         //after pat sucessfully, update the cat info to be petted=true

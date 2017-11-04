@@ -154,7 +154,7 @@ public class Fragment_Settings extends Fragment {
         MyVolleySingleton.getInstance(getActivity()).addToRequestQueue(req);
 
 
-        SharedPreferences sp = getActivity().getSharedPreferences(SHARED_PREF, 0);
+        SharedPreferences sp = getActivity().getSharedPreferences(GlobalValue.SHARED_PREF, 0);
         SharedPreferences.Editor editor = sp.edit();
         editor.putString("cName", etCName.getText().toString());
         editor.putString("pW", URLEncoder.encode(etPW.getText().toString()));
@@ -175,7 +175,7 @@ public class Fragment_Settings extends Fragment {
 
     //loading the data from local storage
     private void loadData(){
-        SharedPreferences sp = getActivity().getSharedPreferences(SHARED_PREF, 0);
+        SharedPreferences sp = getActivity().getSharedPreferences(GlobalValue.SHARED_PREF, 0);
         etCName.setText(sp.getString("cName",""));
         etFName.setText(sp.getString("fName",""));
         etPW.setText(sp.getString("pW",""));

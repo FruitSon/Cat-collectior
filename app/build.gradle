@@ -5,10 +5,11 @@ android {
     buildToolsVersion "26.0.1"
     defaultConfig {
         applicationId "com.example.carlos.assignment_one"
-        minSdkVersion 15
+        minSdkVersion 23
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -20,22 +21,31 @@ android {
 }
 
 dependencies {
+    //cat image overlap on camera
+    compile 'com.varunmishra.catcameraoverlay:catcameraoverlay:1.0.2'
+
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.android.support:recyclerview-v7:26.1.0'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.8.2'
 
     //google map
+    //noinspection GradleCompatible
     implementation 'com.google.android.gms:play-services-maps:11.4.2'
 
     //Volley for networking
     compile 'com.android.volley:volley:1.0.0'
+
     //TabLayout
+    //noinspection GradleCompatible
     compile 'com.android.support:support-v4:26.1.0'
     compile 'com.android.support:design:26.1.0'
+
     //ViewPage
     //android.support.v4.view.ViewPager
     compile 'com.soundcloud.android:android-crop:1.0.1@aar'
     compile 'com.github.michaelye.easydialog:easydialog:1.4'
+
+
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
@@ -43,5 +53,10 @@ dependencies {
     androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+
+    compile 'com.github.danysantiago:sendgrid-android:1',{
+        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+    }
+
     implementation 'com.android.support:support-v13:26.1.0'
 }
